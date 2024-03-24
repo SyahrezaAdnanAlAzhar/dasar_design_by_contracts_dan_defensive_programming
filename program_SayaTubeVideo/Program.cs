@@ -1,4 +1,7 @@
-﻿public class SayaTubeVideo
+﻿using System.Diagnostics;
+using System.Linq.Expressions;
+
+public class SayaTubeVideo
 {
     private int id;
     private string title;
@@ -6,14 +9,23 @@
 
     public SayaTubeVideo(string title)
     {
+        Debug.Assert(title != null && title.Length <= 100, "Title tidak sesuai dengan ketentuan");
         Random random = new Random();
         this.id = random.Next(10000, 100000);
-        this.title = title;
+        this.title = checked(title);
         this.playCount = 0;
     }
     public void IncreasePlayCount(int playCount)
     {
-        this.playCount += playCount;
+        Debug.Assert(playCount > 0 && playCount < 10000000, "Tidak dapat menambah play count terlalu banyak");
+        try
+        {
+            this.playCount = checked(this.playCount + playCount);
+        }
+        catch (OverflowException)
+        {
+            throw new OverflowException("Jumlah play count melebihi batas");
+        }
     }
     public void PrintVideoDetail()
     {
@@ -29,7 +41,12 @@ public class main
     public static void Main(string[] args)
     {
         SayaTubeVideo STV = new SayaTubeVideo("Tutorial Design By Contract - SYAHREZA ADNAN AL AZHAR");
-        STV.IncreasePlayCount(10000001);
+        // STV.IncreasePlayCount(1000000001);
+        int i = 100000;
+        while (i >= 0)
+        {
+            STV.IncreasePlayCount(i);
+        }
         STV.PrintVideoDetail();
     }
 }
